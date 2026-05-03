@@ -68,69 +68,258 @@
 }
 .hero-stat-label{color:var(--t3);font-size:.85rem;margin-top:.2rem}
 
-/* ── Custom CSS Animation ────────────────── */
-.hero-visual{
-  position:relative;z-index:2;
-  height:100%;display:flex;align-items:center;justify-content:center;
+/* ── Modern Dribbble Nova Banking Inspired Animation ── */
+.hero-visual {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1000px;
 }
-.anim-wrapper{
-  position:relative;width:400px;height:400px;
+.nova-anim-wrapper {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  transform-style: preserve-3d;
+  animation: wrapper-hover 8s ease-in-out infinite alternate;
 }
-.floating-orb{
-  position:absolute;border-radius:50%;
-  filter:blur(40px);opacity:0.6;
-  animation:float-complex 10s ease-in-out infinite alternate;
-}
-.orb-1{
-  width:250px;height:250px;background:#F96C00;
-  top:0;left:0;animation-delay:0s;
-}
-.orb-2{
-  width:200px;height:200px;background:#FFB800;
-  bottom:0;right:0;animation-delay:-3s;
-}
-.orb-3{
-  width:150px;height:150px;background:#FF3366;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  animation-delay:-6s;
-}
-.glass-element{
-  position:absolute;
-  background:rgba(255,255,255,0.4);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.8);
-  border-radius:var(--r-xl);
-  box-shadow:0 8px 32px rgba(0,0,0,0.05);
-}
-.el-1{
-  width:220px;height:280px;
-  top:50%;left:50%;transform:translate(-50%,-50%) rotate(-5deg);
-  animation:float-soft 6s ease-in-out infinite;
-  display:flex;flex-direction:column;padding:1.5rem;gap:1rem;
-}
-.el-2{
-  width:160px;height:160px;border-radius:50%;
-  top:10%;right:10%;
-  animation:float-soft 8s ease-in-out infinite reverse;
-}
-.el-3{
-  width:140px;height:60px;border-radius:var(--r-full);
-  bottom:15%;left:5%;
-  animation:float-soft 7s ease-in-out infinite 1s;
-  display:flex;align-items:center;padding:0 1rem;gap:.5rem;
-}
-.mock-line{height:8px;background:rgba(0,0,0,0.1);border-radius:4px;width:100%}
-.mock-circle{width:32px;height:32px;border-radius:50%;background:var(--grad)}
 
-@keyframes float-complex{
-  0%{transform:translate(0,0) scale(1)}
-  50%{transform:translate(30px,-40px) scale(1.1)}
-  100%{transform:translate(-20px,20px) scale(0.95)}
+/* Base glowing orbs in background */
+.nova-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.6;
+  z-index: 1;
 }
-@keyframes float-soft{
-  0%,100%{transform:translateY(0) rotate(var(--rot,0deg))}
-  50%{transform:translateY(-15px) rotate(var(--rot,0deg))}
+.nova-glow-1 {
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, var(--violet), transparent 70%);
+  top: -10%;
+  left: -10%;
+  animation: nova-glow-float 7s ease-in-out infinite;
 }
+.nova-glow-2 {
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, var(--cyan), transparent 70%);
+  bottom: -15%;
+  right: -10%;
+  animation: nova-glow-float 9s ease-in-out infinite reverse;
+}
+
+/* Glassmorphic 3D Shopping Bag */
+.nova-shopping-bag {
+  position: absolute;
+  width: 200px;
+  height: 230px;
+  top: 10%;
+  left: 8%;
+  z-index: 3;
+  transform: rotateY(-10deg) rotateX(15deg) rotateZ(5deg);
+  animation: credit-card-float 6s ease-in-out infinite alternate;
+  perspective: 1000px;
+}
+.nova-shopping-bag .bag-handle {
+  width: 70px;
+  height: 35px;
+  border: 4px solid rgba(255,255,255,0.35);
+  border-bottom: none;
+  border-radius: 40px 40px 0 0;
+  margin: 0 auto;
+  position: relative;
+  top: 6px;
+  z-index: 1;
+  box-shadow: 0 0 15px rgba(255,255,255,0.25);
+}
+.nova-shopping-bag .bag-body {
+  width: 100%;
+  height: calc(100% - 35px);
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.01));
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+.nova-shopping-bag .bag-icon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  animation: float 4s ease-in-out infinite;
+}
+.nova-shopping-bag .bag-label {
+  font-family: var(--fh);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.2px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+
+/* NOVA Glass Feed/Analytics Card */
+.nova-card-feed {
+  position: absolute;
+  width: 240px;
+  height: 160px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  padding: 1.25rem;
+  bottom: 12%;
+  right: 5%;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transform: rotateY(12deg) rotateX(-5deg);
+  animation: feed-card-float 7s ease-in-out infinite alternate-reverse;
+}
+.nova-card-feed .feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nova-card-feed .feed-title {
+  font-size: 0.8rem;
+  color: var(--t2);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+.nova-card-feed .feed-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+.nova-card-feed .feed-amount {
+  font-family: var(--fh);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--t1);
+  margin-bottom: 2px;
+}
+.nova-card-feed .feed-graph {
+  height: 35px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+.nova-card-feed .graph-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--violet), var(--cyan));
+  border-radius: 4px 4px 0 0;
+  height: var(--h, 40%);
+  animation: bar-grow 1.5s ease-out forwards;
+}
+
+/* Floating AI Insight Mini Glass Bubble */
+.nova-bubble {
+  position: absolute;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--t1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  top: 52%;
+  left: 2%;
+  z-index: 5;
+  animation: bubble-float 5s ease-in-out infinite alternate;
+}
+.nova-bubble .avatar-glow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--grad);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  box-shadow: 0 0 10px rgba(139,92,246,0.4);
+}
+
+/* Floating Abstract Micro-Elements */
+.nova-elem {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--violet), var(--pink));
+  z-index: 2;
+  box-shadow: 0 0 15px rgba(139,92,246,0.2);
+}
+.nova-elem-1 {
+  width: 45px;
+  height: 45px;
+  top: 5%;
+  right: 15%;
+  animation: element-spin 12s linear infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: #fff;
+}
+.nova-elem-2 {
+  width: 14px;
+  height: 14px;
+  background: var(--cyan);
+  bottom: 25%;
+  left: 20%;
+  animation: nova-glow-float 4s ease-in-out infinite alternate;
+}
+
+/* Custom Keyframe Animations */
+@keyframes wrapper-hover {
+  0% { transform: rotateX(2deg) rotateY(-2deg); }
+  100% { transform: rotateX(-2deg) rotateY(2deg); }
+}
+@keyframes nova-glow-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(15px, -20px) scale(1.05); }
+}
+@keyframes credit-card-float {
+  0% { transform: translateY(0) rotateY(-10deg) rotateX(15deg) rotateZ(5deg); }
+  100% { transform: translateY(-16px) rotateY(-8deg) rotateX(12deg) rotateZ(3deg); }
+}
+@keyframes feed-card-float {
+  0% { transform: translateY(0) rotateY(12deg) rotateX(-5deg); }
+  100% { transform: translateY(-12px) rotateY(15deg) rotateX(-3deg); }
+}
+@keyframes bubble-float {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-10px) translateX(6px); }
+}
+@keyframes element-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes bar-grow {
+  from { height: 0; }
+  to { height: var(--h); }
+}
+
 @media(max-width:900px){
   .hero{grid-template-columns:1fr;text-align:center;}
   .hero-content{margin:0 auto;padding-top:calc(var(--nav-h) + 2rem)}
@@ -210,25 +399,45 @@
   </div>
 
   <div class="hero-visual">
-    <div class="anim-wrapper">
-      <div class="floating-orb orb-1"></div>
-      <div class="floating-orb orb-2"></div>
-      <div class="floating-orb orb-3"></div>
-      
-      <div class="glass-element el-1" style="--rot:-5deg">
-        <div style="width:100%;height:120px;background:var(--grad);border-radius:var(--r-md);margin-bottom:.5rem"></div>
-        <div class="mock-line"></div>
-        <div class="mock-line" style="width:80%"></div>
-        <div class="mock-line" style="width:60%"></div>
-      </div>
-      <div class="glass-element el-2" style="display:flex;align-items:center;justify-content:center;font-size:4rem">🛍</div>
-      <div class="glass-element el-3">
-        <div class="mock-circle"></div>
-        <div style="flex:1">
-          <div class="mock-line" style="margin-bottom:4px"></div>
-          <div class="mock-line" style="width:60%"></div>
+    <div class="nova-anim-wrapper">
+      <div class="nova-glow nova-glow-1"></div>
+      <div class="nova-glow nova-glow-2"></div>
+
+      <!-- Ultra-Premium Glass Shopping Bag -->
+      <div class="nova-shopping-bag">
+        <div class="bag-handle"></div>
+        <div class="bag-body">
+          <div class="bag-icon">🛍️</div>
+          <div class="bag-label">Premium Gear</div>
         </div>
       </div>
+
+      <!-- Modern Glass Analytics/Feed Card -->
+      <div class="nova-card-feed">
+        <div class="feed-header">
+          <div class="feed-title">Shopping Insights</div>
+          <div class="feed-status"></div>
+        </div>
+        <div class="feed-amount">12.4k Orders</div>
+        <div class="feed-graph">
+          <div class="graph-bar" style="--h: 35%"></div>
+          <div class="graph-bar" style="--h: 65%"></div>
+          <div class="graph-bar" style="--h: 45%"></div>
+          <div class="graph-bar" style="--h: 85%"></div>
+          <div class="graph-bar" style="--h: 55%"></div>
+          <div class="graph-bar" style="--h: 95%"></div>
+        </div>
+      </div>
+
+      <!-- Floating AI Insights mini glass bubble -->
+      <div class="nova-bubble">
+        <div class="avatar-glow">🚀</div>
+        <div>New Purchase: AirPods Max Pro</div>
+      </div>
+
+      <!-- Abstract geometric neon elements -->
+      <div class="nova-elem nova-elem-1">🛍️</div>
+      <div class="nova-elem nova-elem-2"></div>
     </div>
   </div>
 </section>
