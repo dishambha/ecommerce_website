@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+
+{% block extra_css %}
+<style>
+.listing-wrap{display:grid;grid-template-columns:250px 1fr;gap:2rem;align-items:start;padding:2rem 0}
+.filters-panel{position:sticky;top:calc(var(--nav-h)+1rem);background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem}
+.filter-title{font-size:.72rem;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem}
+.filter-link{display:flex;align-items:center;justify-content:space-between;padding:.45rem .7rem;border-radius:var(--r-sm);color:var(--t2);font-size:.875rem;transition:var(--tr-fast);text-decoration:none;margin-bottom:.2rem}
+.filter-link:hover,.filter-link.active{background:rgba(139,92,246,.1);color:var(--violet)}
+.filter-link.active{font-weight:600}
+.filter-count{font-size:.7rem;color:var(--t3);background:rgba(255,255,255,.05);padding:.1rem .4rem;border-radius:var(--r-full)}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.25rem}
+.search-box{display:flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--r-full);padding:.5rem 1rem;transition:var(--tr)}
+.search-box:focus-within{border-color:var(--violet)}
+.search-box input{background:none;border:none;color:var(--t1);font-size:.9rem;min-width:200px;padding:0}
+.search-box input:focus{outline:none;box-shadow:none}
+@media(max-width:900px){.listing-wrap{grid-template-columns:1fr}.filters-panel{position:static}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <nav style="padding:1.5rem 0 0;font-size:.8rem;color:var(--t3);display:flex;gap:.4rem;align-items:center">
+    <a href="/" style="color:var(--t3)">Home</a><span>›</span>
+    <span style="color:var(--t1)">Products</span>
+  </nav>
+
+  <div class="listing-wrap">
+    <aside class="filters-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+        <span style="font-family:var(--fh);font-weight:700">Filters</span>
+        <a href="/products/" style="font-size:.78rem;color:var(--violet)">Clear</a>
+      </div>
+      <div style="margin-bottom:1.5rem">
+        <div class="filter-title">Category</div>
+        <a href="/products/" class="filter-link {% if not request.GET.category %}active{% endif %}">All Products</a>
+        {% for cat in categories %}
+        <a href="/products/?category={{ cat.slug }}" class="filter-link {% if request.GET.category == cat.slug %}active{% endif %}">
+          {{ cat.name }}<span class="filter-count">{{ cat.products.count }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      <div>
+        <div class="filter-title">Price Range</div>
+        <div style="display:flex;gap:.4rem;align-items:center">
+          <input type="number" placeholder="Min" style="width:80px;padding:.35rem .5rem;font-size:.82rem">
+          <span style="color:var(--t3)">–</span>
+          <input type="number" placeholder="Max" style="width:80px;padding:.35rem .5rem;font-size:.82rem">
+        </div>
+      </div>
+    </aside>
+
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+        <div>
+          <h1 style="font-family:var(--fh);font-size:1.6rem;font-weight:800">{% if request.GET.category %}{{ request.GET.category|title }}{% else %}All Products{% endif %}</h1>
+          <p style="color:var(--t3);font-size:.85rem;margin-top:.2rem">{{ products|length }} item{{ products|length|pluralize }}</p>
+        </div>
+        <div class="search-box">
+          <span style="color:var(--t3)">🔍</span>
+          <input type="text" placeholder="Search…" id="searchInput">
+        </div>
+      </div>
+
+      {% if products %}
+      <div class="products-grid" id="productsGrid">
+        {% for p in products %}
+        <div class="product-card reveal" data-name="{{ p.name|lower }}">
+          <div class="product-card-img">
+            {% if p.discount_percent %}<div class="product-card-badge"><span class="badge badge-violet">{{ p.discount_percent }}% OFF</span></div>{% endif %}
+            <div class="product-card-wish">♡</div>
+            {% if p.images.exists %}<img src="{{ p.images.first.image_url }}" alt="{{ p.name }}" style="width:100%;height:100%;object-fit:cover">{% else %}🛍{% endif %}
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-cat">{{ p.category.name|default:"General" }}</div>
+            <div class="product-card-name">{{ p.name }}</div>
+            <p style="font-size:.8rem;color:var(--t3);margin-bottom:.6rem;flex:1">{{ p.description|truncatechars:65 }}</p>
+            <div class="product-card-price">
+              <span class="price-now">₹{{ p.discounted_price }}</span>
+              {% if p.discount_percent %}<span class="price-was">₹{{ p.price }}</span>{% endif %}
+            </div>
+            <span style="font-size:.72rem;display:block;margin-bottom:.75rem;color:{% if p.is_in_stock %}var(--green){% else %}var(--red){% endif %}">
+              {% if p.is_in_stock %}✓ In Stock ({{ p.stock }}){% else %}✗ Out of Stock{% endif %}
+            </span>
+            <div class="product-card-actions">
+              <a href="/products/{{ p.slug }}/" class="btn btn-primary btn-sm" style="flex:1">View</a>
+              {% if user.is_authenticated and p.is_in_stock %}
+              <form method="post" action="/cart/add/{{ p.id }}/">{% csrf_token %}<button class="btn btn-ghost btn-sm" type="submit">🛒</button></form>
+              <form method="post" action="/wishlist/add/{{ p.id }}/">{% csrf_token %}<button class="btn btn-ghost btn-sm" type="submit">♡</button></form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="glass text-center" style="padding:5rem 2rem">
+        <div style="font-size:4rem;margin-bottom:1rem">📦</div>
+        <h2 style="font-family:var(--fh);margin-bottom:.5rem">No products found</h2>
+        <p style="color:var(--t2);margin-bottom:1.5rem">Try a different category.</p>
+        <a href="/products/" class="btn btn-primary">View All</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const inp = document.getElementById('searchInput');
+inp?.addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('#productsGrid .product-card').forEach(c => {
+    c.style.display = c.dataset.name?.includes(q) ? '' : 'none';
+  });
+});
+</script>
+{% endblock %}

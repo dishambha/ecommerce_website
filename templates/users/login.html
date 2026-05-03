@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block no_pad %}0{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.auth-left{
+  background:var(--grad-hero);position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;padding:3rem;
+}
+.auth-left::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 30% 40%,rgba(139,92,246,.25),transparent 50%),
+    radial-gradient(circle at 70% 70%,rgba(34,211,238,.15),transparent 50%);
+}
+.auth-grid{
+  position:absolute;inset:0;opacity:.4;
+  background-image:linear-gradient(rgba(139,92,246,.07) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(139,92,246,.07) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+.auth-left-content{position:relative;z-index:1;text-align:center;max-width:420px}
+.auth-orb{
+  width:200px;height:200px;border-radius:50%;margin:0 auto 2rem;
+  background:radial-gradient(circle at 35% 35%,rgba(139,92,246,.7),rgba(34,211,238,.4),transparent 70%);
+  box-shadow:0 0 80px rgba(139,92,246,.4);
+  display:flex;align-items:center;justify-content:center;font-size:5rem;
+  animation:float 4s ease-in-out infinite;
+}
+.auth-right{display:flex;align-items:center;justify-content:center;padding:3rem;background:var(--surface)}
+.auth-card{width:100%;max-width:420px}
+.auth-logo{font-family:var(--fh);font-size:1.4rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2rem;display:block}
+.auth-title{font-family:var(--fh);font-size:1.75rem;font-weight:800;margin-bottom:.4rem}
+.auth-sub{color:var(--t3);font-size:.875rem;margin-bottom:2rem}
+.auth-divider{text-align:center;position:relative;margin:1.5rem 0}
+.auth-divider::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.auth-divider span{position:relative;background:var(--surface);padding:0 1rem;color:var(--t3);font-size:.8rem}
+@media(max-width:768px){.auth-page{grid-template-columns:1fr}.auth-left{display:none}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <!-- Visual Side -->
+  <div class="auth-left">
+    <div class="auth-grid"></div>
+    <div class="auth-left-content">
+      <div class="auth-orb">🛍</div>
+      <h2 style="font-family:var(--fh);font-size:2rem;font-weight:800;margin-bottom:.75rem">Welcome back</h2>
+      <p style="color:var(--t2);line-height:1.7">Sign in to access your orders, wishlist, and exclusive member deals.</p>
+      <div style="display:flex;gap:1.5rem;justify-content:center;margin-top:2rem;flex-wrap:wrap">
+        <div style="text-align:center">
+          <div style="font-family:var(--fh);font-size:1.5rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">50K+</div>
+          <div style="font-size:.75rem;color:var(--t3)">Members</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--fh);font-size:1.5rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">4.9★</div>
+          <div style="font-size:.75rem;color:var(--t3)">Rating</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:var(--fh);font-size:1.5rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">1000+</div>
+          <div style="font-size:.75rem;color:var(--t3)">Products</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <a href="/" class="auth-logo">⬡ Bazuka</a>
+      <h1 class="auth-title">Sign In</h1>
+      <p class="auth-sub">Don't have an account? <a href="/accounts/signup/" style="color:var(--violet);font-weight:600">Create one free →</a></p>
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<p style="color:var(--red);font-size:.78rem;margin-top:.35rem">{{ field.errors.as_text }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem">
+          <a href="#" style="font-size:.82rem;color:var(--violet)">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Sign In →</button>
+      </form>
+
+      <div class="auth-divider"><span>or continue with</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+        <button class="btn btn-ghost" style="gap:.5rem">🔵 Google</button>
+        <button class="btn btn-ghost" style="gap:.5rem">🍎 Apple</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

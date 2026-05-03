@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}My Cart{% endblock %}
+
+{% block extra_css %}
+<style>
+.cart-wrap{display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start;padding:2.5rem 0}
+@media(max-width:900px){.cart-wrap{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="padding:1.5rem 0 .5rem">
+    <h1 style="font-family:var(--fh);font-size:2rem;font-weight:800">Shopping Cart</h1>
+    <p style="color:var(--t3);font-size:.875rem;margin-top:.25rem">
+      {% if cart.items.all %}{{ cart.item_count }} item{{ cart.item_count|pluralize }} in your cart{% else %}Your cart is empty{% endif %}
+    </p>
+  </div>
+
+  {% if cart.items.all %}
+  <div class="cart-wrap">
+    <!-- Items -->
+    <div class="glass" style="overflow:hidden">
+      <table class="cart-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart.items.all %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:1rem">
+                <div style="width:64px;height:64px;border-radius:var(--r-md);background:var(--grad-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;overflow:hidden">
+                  {% if item.product.images.exists %}<img src="{{ item.product.images.first.image_url }}" style="width:100%;height:100%;object-fit:cover">{% else %}🛍{% endif %}
+                </div>
+                <div>
+                  <a href="/products/{{ item.product.slug }}/" style="font-family:var(--fh);font-weight:700;font-size:.95rem;color:var(--t1);transition:var(--tr-fast)">{{ item.product.name }}</a>
+                  <div style="font-size:.75rem;color:var(--t3);margin-top:.2rem">{{ item.product.category.name|default:"General" }}</div>
+                </div>
+              </div>
+            </td>
+            <td style="font-weight:600;color:var(--t2)">₹{{ item.product.discounted_price }}</td>
+            <td>
+              <form method="post" action="/cart/update/{{ item.id }}/" id="qtyForm{{ item.id }}">
+                {% csrf_token %}
+                <div class="qty-control">
+                  <button type="button" class="qty-btn" onclick="changeQty({{ item.id }},-1)">−</button>
+                  <input class="qty-input" type="number" name="quantity" value="{{ item.quantity }}" min="0" max="{{ item.product.stock }}" id="qty{{ item.id }}" onchange="document.getElementById('qtyForm{{ item.id }}').submit()">
+                  <button type="button" class="qty-btn" onclick="changeQty({{ item.id }},1)">+</button>
+                </div>
+              </form>
+            </td>
+            <td style="font-family:var(--fh);font-weight:800;font-size:1.05rem;color:var(--violet)">₹{{ item.subtotal }}</td>
+            <td>
+              <form method="post" action="/cart/remove/{{ item.id }}/">{% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm" title="Remove">✕</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3 style="font-family:var(--fh);font-size:1.15rem;font-weight:800;margin-bottom:1.25rem">Order Summary</h3>
+
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>₹{{ cart.total }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span style="color:var(--green)">{% if cart.total >= 999 %}Free{% else %}₹99{% endif %}</span>
+      </div>
+      <div class="summary-row">
+        <span>Taxes (18%)</span>
+        <span>₹{{ cart.total|floatformat:0 }}</span>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span style="color:var(--violet)">₹{{ cart.total }}</span>
+      </div>
+
+      <div style="margin:1.5rem 0;padding:1rem;background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.15);border-radius:var(--r-md)">
+        <div style="font-size:.72rem;color:var(--violet);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem">Promo Code</div>
+        <div style="display:flex;gap:.5rem">
+          <input type="text" placeholder="Enter code…" style="flex:1;padding:.5rem .75rem;font-size:.85rem">
+          <button class="btn btn-ghost btn-sm">Apply</button>
+        </div>
+      </div>
+
+      <a href="/orders/checkout/" class="btn btn-primary btn-full btn-lg" style="margin-bottom:.75rem">Proceed to Checkout →</a>
+      <a href="/products/" class="btn btn-outline btn-full">Continue Shopping</a>
+
+      <div style="margin-top:1.25rem;display:flex;justify-content:center;gap:1rem">
+        <span style="font-size:.72rem;color:var(--t3)">🔒 SSL Secure</span>
+        <span style="font-size:.72rem;color:var(--t3)">↩ Easy Returns</span>
+        <span style="font-size:.72rem;color:var(--t3)">🚚 Fast Delivery</span>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:6rem 2rem">
+    <div style="font-size:6rem;margin-bottom:1.5rem;animation:float 3s ease-in-out infinite">🛒</div>
+    <h2 style="font-family:var(--fh);font-size:1.75rem;font-weight:800;margin-bottom:.75rem">Your cart is empty</h2>
+    <p style="color:var(--t2);margin-bottom:2rem">Looks like you haven't added anything yet.</p>
+    <a href="/products/" class="btn btn-primary btn-lg">Start Shopping →</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeQty(id, delta) {
+  const input = document.getElementById('qty' + id);
+  const newVal = Math.max(0, parseInt(input.value || 1) + delta);
+  input.value = newVal;
+  document.getElementById('qtyForm' + id).submit();
+}
+</script>
+{% endblock %}

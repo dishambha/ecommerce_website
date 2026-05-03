@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-wrap{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;padding:3rem 0}
+.product-gallery{position:sticky;top:calc(var(--nav-h)+1.5rem)}
+.gallery-main{
+  aspect-ratio:1;background:var(--grad-card);border:1px solid var(--border);
+  border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;
+  font-size:8rem;position:relative;overflow:hidden;margin-bottom:1rem;
+}
+.gallery-main img{width:100%;height:100%;object-fit:cover}
+.gallery-thumbs{display:flex;gap:.75rem}
+.gallery-thumb{
+  width:72px;height:72px;border-radius:var(--r-md);
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;cursor:pointer;transition:var(--tr);overflow:hidden;
+}
+.gallery-thumb.active,.gallery-thumb:hover{border-color:var(--violet)}
+.product-info{padding-top:1rem}
+.product-cat{font-size:.78rem;color:var(--violet);font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.product-name{font-family:var(--fh);font-size:2.2rem;font-weight:800;letter-spacing:-.04em;line-height:1.15;margin-bottom:1rem}
+.product-rating{display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem}
+.stars{color:var(--gold);letter-spacing:1px}
+.rating-count{font-size:.82rem;color:var(--t3)}
+.product-price-wrap{display:flex;align-items:baseline;gap:1rem;margin-bottom:1.5rem}
+.product-price{font-family:var(--fh);font-size:2.5rem;font-weight:800;color:var(--t1)}
+.product-price-was{font-size:1rem;color:var(--t3);text-decoration:line-through}
+.product-desc{color:var(--t2);line-height:1.75;margin-bottom:1.75rem;font-size:.95rem}
+.product-meta{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.75rem}
+.meta-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r-md);padding:.85rem 1rem}
+.meta-label{font-size:.7rem;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem}
+.meta-value{font-weight:600;font-size:.9rem;color:var(--t1)}
+.product-actions{display:flex;flex-direction:column;gap:.75rem}
+.actions-row{display:flex;gap:.75rem}
+.qty-wrap{display:flex;align-items:center;gap:.5rem;background:var(--card);border:1px solid var(--border);border-radius:var(--r-full);padding:.35rem;width:fit-content}
+.qty-btn{width:36px;height:36px;border-radius:50%;background:none;border:none;color:var(--t1);cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:var(--tr-fast)}
+.qty-btn:hover{background:rgba(139,92,246,.15);color:var(--violet)}
+.qty-num{width:48px;text-align:center;background:none;border:none;color:var(--t1);font-weight:700;font-size:1rem;padding:0}
+@media(max-width:800px){.detail-wrap{grid-template-columns:1fr;gap:2rem}.product-gallery{position:static}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <nav style="padding:1.5rem 0;font-size:.8rem;color:var(--t3);display:flex;gap:.4rem;align-items:center">
+    <a href="/" style="color:var(--t3)">Home</a><span>›</span>
+    <a href="/products/" style="color:var(--t3)">Products</a><span>›</span>
+    <span style="color:var(--t1)">{{ product.name }}</span>
+  </nav>
+
+  <div class="detail-wrap">
+    <!-- Gallery -->
+    <div class="product-gallery">
+      <div class="gallery-main" id="galleryMain">
+        {% if product.images.exists %}
+          <img src="{{ product.images.first.image_url }}" alt="{{ product.name }}" id="mainImg">
+        {% else %}🛍{% endif %}
+        {% if product.discount_percent %}
+        <div style="position:absolute;top:1.25rem;left:1.25rem">
+          <span class="badge badge-violet" style="font-size:.85rem;padding:.4rem .9rem">{{ product.discount_percent }}% OFF</span>
+        </div>
+        {% endif %}
+      </div>
+      {% if product.images.count > 1 %}
+      <div class="gallery-thumbs">
+        {% for img in product.images.all %}
+        <div class="gallery-thumb {% if forloop.first %}active{% endif %}" onclick="switchImg('{{ img.image_url }}', this)">
+          <img src="{{ img.image_url }}" alt="{{ img.alt_text }}" style="width:100%;height:100%;object-fit:cover">
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Info -->
+    <div class="product-info">
+      <div class="product-cat">{{ product.category.name|default:"General" }}</div>
+      <h1 class="product-name">{{ product.name }}</h1>
+
+      <div class="product-rating">
+        <span class="stars">★★★★★</span>
+        <span style="font-size:.9rem;font-weight:700">4.9</span>
+        <span class="rating-count">(128 reviews)</span>
+      </div>
+
+      <div class="product-price-wrap">
+        <span class="product-price">₹{{ product.discounted_price }}</span>
+        {% if product.discount_percent %}
+        <span class="product-price-was">₹{{ product.price }}</span>
+        <span class="badge badge-violet">Save {{ product.discount_percent }}%</span>
+        {% endif %}
+      </div>
+
+      <p class="product-desc">{{ product.description }}</p>
+
+      <div class="product-meta">
+        <div class="meta-item">
+          <div class="meta-label">Availability</div>
+          <div class="meta-value" style="color:{% if product.is_in_stock %}var(--green){% else %}var(--red){% endif %}">
+            {% if product.is_in_stock %}✓ In Stock{% else %}✗ Out of Stock{% endif %}
+          </div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Stock Qty</div>
+          <div class="meta-value">{{ product.stock }} units</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">{{ product.category.name|default:"—" }}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">SKU</div>
+          <div class="meta-value">#{{ product.id|stringformat:"06d" }}</div>
+        </div>
+      </div>
+
+      {% if user.is_authenticated %}
+      <div class="product-actions">
+        {% if product.is_in_stock %}
+        <form method="post" action="/cart/add/{{ product.id }}/">
+          {% csrf_token %}
+          <div class="actions-row">
+            <button type="submit" class="btn btn-primary btn-lg" style="flex:1">🛒 Add to Cart</button>
+            <form method="post" action="/wishlist/add/{{ product.id }}/" style="display:contents">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline" style="width:54px;height:54px;border-radius:50%;padding:0;font-size:1.2rem">♡</button>
+            </form>
+          </div>
+        </form>
+        {% else %}
+        <button class="btn btn-ghost btn-lg btn-full" disabled style="cursor:not-allowed;opacity:.5">Out of Stock</button>
+        {% endif %}
+        <a href="/cart/" class="btn btn-outline btn-full">View Cart →</a>
+      </div>
+      {% else %}
+      <a href="/accounts/login/?next=/products/{{ product.slug }}/" class="btn btn-primary btn-lg btn-full">Login to Purchase</a>
+      {% endif %}
+
+      <div style="margin-top:1.5rem;display:flex;gap:1.5rem;flex-wrap:wrap">
+        <span style="font-size:.8rem;color:var(--t3);display:flex;align-items:center;gap:.4rem">🚚 Free shipping over ₹999</span>
+        <span style="font-size:.8rem;color:var(--t3);display:flex;align-items:center;gap:.4rem">↩ 30-day returns</span>
+        <span style="font-size:.8rem;color:var(--t3);display:flex;align-items:center;gap:.4rem">🔒 Secure checkout</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchImg(url, el) {
+  document.getElementById('mainImg')?.setAttribute('src', url);
+  document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+{% endblock %}

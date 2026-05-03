@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bazuka — Premium shopping experience">
+  <title>{% block title %}Bazuka{% endblock %} | Premium Shopping</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍</text></svg>">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  {% block extra_css %}{% endblock %}
+  <script>
+    // Apply theme immediately to prevent FOUC
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────── -->
+<header class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">⬡ Bazuka</a>
+
+    <ul class="nav-links">
+      <li><a href="/products/">Products</a></li>
+      <li><a href="/products/?category=electronics">Electronics</a></li>
+      <li><a href="/products/?category=fashion">Fashion</a></li>
+      <li><a href="/orders/history/">Orders</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button id="themeToggle" class="nav-icon-btn" title="Toggle Theme" style="border-radius:var(--r-full); border:none; background:transparent">🌙</button>
+      {% if user.is_authenticated %}
+        <a href="/wishlist/" class="nav-icon-btn" title="Wishlist">♡</a>
+        <a href="/cart/" class="nav-icon-btn" title="Cart">
+          🛒
+          <span class="nav-badge">0</span>
+        </a>
+        <a href="/accounts/profile/" class="btn-nav btn-nav-ghost">{{ user.email|truncatechars:18 }}</a>
+        <form method="post" action="/accounts/logout/" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="btn-nav btn-nav-fill">Logout</button>
+        </form>
+      {% else %}
+        <a href="/accounts/login/" class="btn-nav btn-nav-ghost">Login</a>
+        <a href="/accounts/signup/" class="btn-nav btn-nav-fill">Sign Up</a>
+      {% endif %}
+      {% if user.is_staff %}
+        <a href="/admin/" class="nav-icon-btn" title="Admin" style="color:var(--violet)">⚙</a>
+      {% endif %}
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Nav Drawer -->
+<div id="mobileNav" style="
+  display:none;position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;
+  background:var(--mobile-nav-bg);backdrop-filter:blur(20px);
+  z-index:999;padding:2rem;flex-direction:column;gap:1rem;
+">
+  <a href="/products/" style="color:var(--t2);font-size:1.2rem;font-weight:600;padding:.75rem 0;border-bottom:1px solid var(--border)">Products</a>
+  <a href="/cart/" style="color:var(--t2);font-size:1.2rem;font-weight:600;padding:.75rem 0;border-bottom:1px solid var(--border)">Cart</a>
+  <a href="/wishlist/" style="color:var(--t2);font-size:1.2rem;font-weight:600;padding:.75rem 0;border-bottom:1px solid var(--border)">Wishlist</a>
+  <a href="/orders/history/" style="color:var(--t2);font-size:1.2rem;font-weight:600;padding:.75rem 0;border-bottom:1px solid var(--border)">Orders</a>
+  <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.75rem">
+    {% if user.is_authenticated %}
+      <a href="/accounts/profile/" class="btn btn-ghost">Profile</a>
+    {% else %}
+      <a href="/accounts/login/" class="btn btn-outline">Login</a>
+      <a href="/accounts/signup/" class="btn btn-primary">Sign Up</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Messages -->
+{% if messages %}
+<div class="messages-wrap">
+  {% for message in messages %}
+  <div class="message-toast {{ message.tags }}">
+    {% if 'error' in message.tags %}⚠{% else %}✓{% endif %}
+    {{ message }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Page Content -->
+<main style="padding-top:{% block no_pad %}var(--nav-h){% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── Footer ─────────────────────────────── -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">⬡ Bazuka</div>
+        <p class="footer-desc">Premium products delivered to your door. Quality you can trust, prices you'll love.</p>
+        <div class="footer-social" style="margin-top:1.25rem">
+          <a href="#">𝕏</a><a href="#">in</a><a href="#">f</a><a href="#">▶</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul>
+          <li><a href="/products/">All Products</a></li>
+          <li><a href="/products/?category=electronics">Electronics</a></li>
+          <li><a href="/products/?category=fashion">Fashion</a></li>
+          <li><a href="/products/?category=home">Home & Living</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <ul>
+          <li><a href="/accounts/profile/">My Profile</a></li>
+          <li><a href="/orders/history/">Orders</a></li>
+          <li><a href="/wishlist/">Wishlist</a></li>
+          <li><a href="/cart/">Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 Bazuka. All rights reserved.</span>
+      <span class="footer-copy">Built with Django 🐍</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Navbar scroll effect
+const navbar = document.getElementById('navbar');
+const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 40);
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+// Theme Toggle
+const themeBtn = document.getElementById('themeToggle');
+const updateBtnIcon = () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+};
+updateBtnIcon();
+themeBtn?.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateBtnIcon();
+});
+
+// Mobile nav toggle
+const toggle = document.getElementById('navToggle');
+const mobileNav = document.getElementById('mobileNav');
+toggle?.addEventListener('click', () => {
+  const open = mobileNav.style.display === 'flex';
+  mobileNav.style.display = open ? 'none' : 'flex';
+});
+
+// Auto-dismiss messages
+document.querySelectorAll('.message-toast').forEach(el => {
+  setTimeout(() => el.style.opacity = '0', 3500);
+  setTimeout(() => el.remove(), 3800);
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible') });
+}, {threshold:.1, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

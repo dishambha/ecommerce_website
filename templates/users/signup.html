@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Sign Up{% endblock %}
+{% block no_pad %}0{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-page{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.auth-left{background:var(--grad-hero);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:3rem}
+.auth-left::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,rgba(139,92,246,.25),transparent 50%),radial-gradient(circle at 70% 70%,rgba(34,211,238,.15),transparent 50%)}
+.auth-grid{position:absolute;inset:0;opacity:.4;background-image:linear-gradient(rgba(139,92,246,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(139,92,246,.07) 1px,transparent 1px);background-size:50px 50px}
+.auth-left-content{position:relative;z-index:1;text-align:center;max-width:400px}
+.auth-right{display:flex;align-items:center;justify-content:center;padding:3rem;background:var(--surface);overflow-y:auto}
+.auth-card{width:100%;max-width:440px;padding:1rem 0}
+.auth-logo{font-family:var(--fh);font-size:1.4rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2rem;display:block}
+.perk{display:flex;align-items:center;gap:.75rem;padding:.75rem;border-radius:var(--r-md);background:rgba(0,0,0,.03);border:1px solid var(--border);margin-bottom:.6rem}
+.perk-icon{font-size:1.4rem;flex-shrink:0}
+.perk-text{font-size:.85rem;color:var(--t2)}
+.perk-text strong{color:var(--t1);font-weight:600;display:block;font-size:.9rem}
+@media(max-width:768px){.auth-page{grid-template-columns:1fr}.auth-left{display:none}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <!-- Visual Side -->
+  <div class="auth-left">
+    <div class="auth-grid"></div>
+    <div class="auth-left-content">
+      <div style="font-size:4rem;margin-bottom:1.5rem;animation:float 4s ease-in-out infinite">✦</div>
+      <h2 style="font-family:var(--fh);font-size:2rem;font-weight:800;margin-bottom:.75rem">Join Bazuka</h2>
+      <p style="color:var(--t2);margin-bottom:2rem;line-height:1.7">Create your free account and unlock premium shopping benefits.</p>
+      <div>
+        <div class="perk">
+          <span class="perk-icon">🎁</span>
+          <div class="perk-text"><strong>20% Welcome Discount</strong>On your very first order</div>
+        </div>
+        <div class="perk">
+          <span class="perk-icon">🚀</span>
+          <div class="perk-text"><strong>Free Express Delivery</strong>On orders above ₹999</div>
+        </div>
+        <div class="perk">
+          <span class="perk-icon">🔒</span>
+          <div class="perk-text"><strong>Secure Checkout</strong>256-bit SSL encryption always</div>
+        </div>
+        <div class="perk">
+          <span class="perk-icon">↩</span>
+          <div class="perk-text"><strong>30-Day Returns</strong>No questions asked</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Side -->
+  <div class="auth-right">
+    <div class="auth-card">
+      <a href="/" class="auth-logo">⬡ Bazuka</a>
+      <h1 style="font-family:var(--fh);font-size:1.75rem;font-weight:800;margin-bottom:.4rem">Create Account</h1>
+      <p style="color:var(--t3);font-size:.875rem;margin-bottom:2rem">Already have an account? <a href="/accounts/login/" style="color:var(--violet);font-weight:600">Sign in →</a></p>
+
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<p style="color:var(--red);font-size:.78rem;margin-top:.35rem">{{ field.errors.as_text }}</p>{% endif %}
+          {% if field.help_text %}<p style="color:var(--t3);font-size:.75rem;margin-top:.3rem">{{ field.help_text }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:.5rem">Create My Account →</button>
+        <p style="text-align:center;font-size:.75rem;color:var(--t3);margin-top:1rem">By signing up, you agree to our <a href="#" style="color:var(--violet)">Terms</a> and <a href="#" style="color:var(--violet)">Privacy Policy</a></p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

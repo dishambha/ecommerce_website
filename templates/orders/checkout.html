@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+<div style="display:grid; grid-template-columns:1fr 320px; gap:1.5rem; align-items:start;">
+  <div class="card">
+    <h3 style="margin-bottom:1.5rem;">Shipping Address</h3>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Full Shipping Address</label>
+        <textarea name="shipping_address" rows="5" style="width:100%; padding:0.65rem 1rem; background:#0f0f13; border:1px solid #2d3748; border-radius:8px; color:#e2e8f0; font-size:0.95rem; resize:vertical;" required placeholder="Enter your full address, city, state, PIN code..."></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%; padding:0.8rem;" type="submit">Place Order</button>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Cart Summary</h3>
+    <div style="margin:1rem 0;">
+      {% for item in cart.items.all %}
+      <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #2d3748;">
+        <span style="color:#a0aec0; font-size:0.9rem;">{{ item.product.name }} × {{ item.quantity }}</span>
+        <span style="font-weight:600;">₹{{ item.subtotal }}</span>
+      </div>
+      {% endfor %}
+      <div style="display:flex; justify-content:space-between; margin-top:1rem; font-size:1.2rem; font-weight:700;">
+        <span>Total</span><span style="color:#667eea;">₹{{ cart.total }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
